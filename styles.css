@@ -1,0 +1,222 @@
+:root {
+  color-scheme: dark;
+  --background: #10111a;
+  --surface: #171923;
+  --surface-raised: #1c1f2c;
+  --line: #2a2d3b;
+  --muted: #858797;
+  --subtle: #5b5e70;
+  --white: #f4f3ef;
+  --lime: #d5f56a;
+  --cyan: #6fe4d2;
+  font-family: "Manrope", "Noto Sans JP", sans-serif;
+  background: var(--background);
+  color: var(--white);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at 85% 8%, rgba(75, 73, 116, .17), transparent 31rem),
+    var(--background);
+}
+button, select, input { font: inherit; }
+button { color: inherit; }
+.app-shell { width: min(1120px, calc(100% - 64px)); margin: 0 auto; }
+.topbar { height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,.08); }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--white); font-size: 21px; font-weight: 800; letter-spacing: -.08em; }
+.brand-mark { width: 18px; height: 18px; display: flex; align-items: center; gap: 2px; }
+.brand-mark i { width: 3px; border-radius: 4px; background: var(--lime); }
+.brand-mark i:nth-child(1), .brand-mark i:nth-child(4) { height: 7px; }
+.brand-mark i:nth-child(2) { height: 15px; }
+.brand-mark i:nth-child(3) { height: 11px; }
+.brand-period, .title-period { color: var(--lime); }
+.topbar-note, .about-link, .eyebrow, .instrument-name h2, .panel-heading h3, .control-label, .range-ends, .panel-bottom, .audio-status, .playing-label, .note-readout-caption, .visualizer-label, .visualizer-scale, .keyboard-title, .keyboard-octave, .key-hint, .midi-copy strong, .midi-button, .section-index, .guide-heading h2, .step-number, .step-mark, .footer { font-family: "DM Mono", "Noto Sans JP", monospace; }
+.topbar-note { margin-left: 53px; font-size: 10px; letter-spacing: .12em; color: #a2a3ae; display: flex; align-items: center; gap: 9px; }
+.live-dot, .audio-status-dot, .playing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 9px rgba(213,245,106,.6); }
+.topbar-divider { color: #4e5060; }
+.about-link { color: #aaaab4; text-decoration: none; font-size: 10px; letter-spacing: .1em; transition: color .2s; }
+.about-link:hover { color: var(--lime); }
+.about-link span { padding-left: 5px; color: var(--lime); }
+.intro { padding: 67px 0 43px; }
+.eyebrow { display: flex; align-items: center; gap: 13px; font-size: 9px; letter-spacing: .19em; color: var(--lime); }
+.eyebrow-line { width: 46px; height: 1px; background: #555d38; }
+.intro-content { margin-top: 18px; display: flex; justify-content: space-between; align-items: flex-end; }
+h1 { margin: 0; font-family: "Noto Sans JP", sans-serif; font-size: clamp(38px, 5.2vw, 61px); line-height: 1.25; letter-spacing: -.075em; font-weight: 700; }
+.intro-copy { margin: 13px 0 0; color: #9b9daa; font-family: "Noto Sans JP", sans-serif; font-size: 13px; line-height: 1.95; }
+.intro-stamp { position: relative; width: 80px; height: 80px; margin: 0 17px 2px 0; border: 1px solid #383a47; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #9294a3; font-family: "DM Mono", monospace; font-size: 9px; letter-spacing: .2em; line-height: 1.6; transform: rotate(-12deg); }
+.stamp-star { position: absolute; right: -6px; top: 5px; color: var(--lime); font-size: 19px; }
+.instrument { border: 1px solid #30323f; background: rgba(23,25,35,.84); box-shadow: 0 25px 65px rgba(0,0,0,.16); }
+.instrument-heading { height: 79px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+.instrument-name { display: flex; align-items: center; gap: 15px; }
+.section-index { color: var(--lime); font-size: 11px; }
+.instrument-name h2, .panel-heading h3, .guide-heading h2 { margin: 0; font-weight: 500; font-size: 11px; letter-spacing: .13em; }
+.instrument-name p { margin: 5px 0 0; color: var(--muted); font-family: "Noto Sans JP", sans-serif; font-size: 11px; }
+.audio-status { color: #8f91a0; font-size: 9px; letter-spacing: .09em; display: flex; align-items: center; gap: 8px; }
+.audio-status-dot { width: 5px; height: 5px; background: #687087; box-shadow: none; }
+.audio-status.is-playing .audio-status-dot { background: var(--lime); box-shadow: 0 0 9px rgba(213,245,106,.65); }
+.studio { display: grid; grid-template-columns: 244px minmax(0,1fr); min-height: 370px; }
+.controls-panel { padding: 23px 22px 18px; display: flex; flex-direction: column; border-right: 1px solid var(--line); }
+.panel-heading { display: flex; align-items: center; gap: 9px; padding-bottom: 24px; }
+.panel-icon { font-size: 16px; color: var(--lime); }
+.panel-heading h3 { font-size: 10px; letter-spacing: .1em; }
+.control-label { display: flex; justify-content: space-between; color: #aaacb8; font-size: 9px; letter-spacing: .08em; }
+.control-label span { color: var(--subtle); }
+.select-wrap { position: relative; margin-top: 9px; }
+select { appearance: none; width: 100%; height: 39px; padding: 0 34px 0 12px; border: 1px solid #393b49; border-radius: 2px; background: #20222e; color: var(--white); font-family: "DM Mono", monospace; font-size: 10px; letter-spacing: .04em; cursor: pointer; }
+select:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--lime); outline-offset: 3px; }
+.select-arrow { position: absolute; right: 12px; top: 8px; color: var(--lime); pointer-events: none; }
+.slider-control { margin-top: 25px; }
+.slider-heading { display: flex; align-items: center; justify-content: space-between; }
+.slider-heading output { color: var(--lime); font-family: "DM Mono", monospace; font-size: 10px; }
+input[type="range"] { width: 100%; height: 14px; margin: 12px 0 0; appearance: none; background: transparent; cursor: pointer; }
+input[type="range"]::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, var(--lime) var(--range-progress, 50%), #414350 var(--range-progress, 50%)); }
+input[type="range"]::-moz-range-track { height: 2px; background: #414350; }
+input[type="range"]::-moz-range-progress { height: 2px; background: var(--lime); }
+input[type="range"]::-webkit-slider-thumb { width: 10px; height: 10px; margin-top: -4px; appearance: none; border: 2px solid var(--lime); border-radius: 50%; background: #20222e; }
+input[type="range"]::-moz-range-thumb { width: 7px; height: 7px; border: 2px solid var(--lime); border-radius: 50%; background: #20222e; }
+.range-ends { margin-top: 3px; display: flex; justify-content: space-between; color: #686b7a; font-size: 8px; letter-spacing: .06em; }
+.detune-control { margin-top: 19px; }
+.panel-bottom { margin-top: auto; padding-top: 14px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); color: #7b7d8d; font-size: 8px; letter-spacing: .08em; }
+.panel-bottom b { color: var(--lime); font-size: 8px; }
+.wave-display { display: block; width: 79px; height: 19px; }
+.wave-display svg { width: 100%; height: 100%; overflow: visible; }
+.wave-display path { fill: none; stroke: var(--cyan); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.playing-panel { padding: 19px 24px 15px; min-width: 0; }
+.playing-top { display: flex; justify-content: space-between; align-items: center; height: 20px; }
+.playing-label { display: flex; align-items: center; gap: 8px; color: #9294a1; font-size: 9px; letter-spacing: .1em; }
+.playing-dot { width: 5px; height: 5px; background: var(--cyan); box-shadow: 0 0 8px rgba(111,228,210,.4); }
+.note-readout { display: flex; align-items: baseline; gap: 7px; }
+.note-readout > span:first-child { color: var(--lime); font-family: "DM Mono", monospace; font-size: 16px; min-width: 22px; text-align: right; }
+.note-readout-caption { color: #727584; font-size: 8px; letter-spacing: .08em; }
+.visualizer { height: 131px; position: relative; margin-top: 9px; overflow: hidden; border: 1px solid #2c303c; background: #141721; }
+.visualizer-grid { position: absolute; inset: 0; opacity: .65; background-image: linear-gradient(rgba(104,112,134,.12) 1px,transparent 1px), linear-gradient(90deg,rgba(104,112,134,.12) 1px,transparent 1px); background-size: 36px 27px; }
+.visualizer-label { position: absolute; top: 10px; left: 11px; z-index: 1; color: #737687; font-size: 8px; letter-spacing: .1em; }
+.visualizer-label span { margin-left: 5px; color: var(--cyan); }
+#visualizer { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+.visualizer-scale { position: absolute; right: 10px; bottom: 8px; left: 10px; display: flex; justify-content: space-between; color: #626677; font-size: 7px; letter-spacing: .08em; }
+.keyboard-topline { margin: 17px 0 9px; display: flex; justify-content: space-between; align-items: center; }
+.keyboard-title { display: flex; gap: 9px; align-items: center; color: #c0c1c9; font-size: 9px; letter-spacing: .1em; }
+.keyboard-octave { padding: 3px 5px; color: #777a89; border: 1px solid #353845; font-size: 7px; letter-spacing: .04em; }
+.octave-control { display: flex; align-items: center; gap: 8px; color: #858797; font-family: "DM Mono", monospace; font-size: 8px; }
+.octave-control button { width: 20px; height: 20px; padding: 0; border: 1px solid #3b3d4a; background: #20222e; color: #b7b8c2; cursor: pointer; transition: border-color .15s, color .15s; }
+.octave-control button:hover { color: var(--lime); border-color: var(--lime); }
+.piano { height: 101px; position: relative; display: flex; user-select: none; touch-action: none; }
+.piano-key { position: relative; border-radius: 0 0 3px 3px; cursor: pointer; touch-action: none; transition: background-color .07s, transform .07s, box-shadow .07s; }
+.piano-key.white { flex: 1; z-index: 0; height: 100%; border: 1px solid #c4c5cb; border-top: 0; background: linear-gradient(180deg,#f4f3ef 0%,#dedee0 100%); box-shadow: 0 3px 0 #aaaab0; }
+.piano-key.white + .piano-key.white { margin-left: -1px; }
+.piano-key.black { width: 5.3%; height: 61%; z-index: 1; margin-left: -2.65%; margin-right: -2.65%; border: 1px solid #090a0e; background: linear-gradient(180deg,#393c49 0%,#1d1f29 100%); box-shadow: 0 3px 0 #08090c; }
+.piano-key.black::after { content: ""; position: absolute; inset: 0 25% auto; height: 65%; border-radius: 0 0 2px 2px; background: linear-gradient(90deg,rgba(255,255,255,.05),transparent); }
+.piano-key.white.active { transform: translateY(2px); background: linear-gradient(180deg,#e3f3aa,#c9ed71); box-shadow: 0 1px 0 #9ec644; }
+.piano-key.black.active { transform: translateY(2px); background: linear-gradient(180deg,#c4e878,#8eae42); box-shadow: 0 1px 0 #75902f; }
+.key-label { position: absolute; bottom: 7px; left: 0; width: 100%; color: #8a8b91; text-align: center; font-family: "DM Mono", monospace; font-size: 7px; }
+.piano-key.black .key-label { bottom: 5px; color: #d0d1d5; font-size: 6px; }
+.piano-key.active .key-label { color: #293316; }
+.key-hint { display: flex; align-items: center; gap: 7px; height: 28px; color: #787b8a; font-size: 8px; letter-spacing: .05em; }
+.computer-icon { color: var(--lime); font-size: 12px; }
+.hint-separator { color: #4f5260; }
+.key-hint-right { margin-left: auto; color: #afb0ba; font-size: 8px; }
+.key-hint-right span { padding: 0 4px; color: #616473; }
+.instrument-footer { min-height: 68px; padding: 12px 25px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); background: rgba(20,22,31,.6); }
+.midi-copy { display: flex; align-items: center; gap: 12px; }
+.midi-icon { display: grid; place-items: center; width: 29px; height: 29px; border: 1px solid #424551; color: var(--cyan); font-size: 16px; }
+.midi-copy strong, .midi-copy span { display: block; }
+.midi-copy strong { color: #d4d4d9; font-size: 9px; font-weight: 400; letter-spacing: .09em; }
+.midi-copy div > span { margin-top: 4px; color: #848695; font-family: "Noto Sans JP", sans-serif; font-size: 9px; }
+.midi-button { height: 33px; padding: 0 12px; display: flex; align-items: center; gap: 8px; border: 1px solid #4b4f5e; background: transparent; color: #d6d6dc; font-size: 9px; letter-spacing: .03em; cursor: pointer; transition: border-color .15s, color .15s; }
+.midi-button:hover:not(:disabled) { color: var(--lime); border-color: var(--lime); }
+.midi-button:disabled { opacity: .45; cursor: not-allowed; }
+.midi-button > span:last-child { color: var(--lime); }
+.midi-button-dot { width: 5px; height: 5px; border-radius: 50%; background: #8b8d99; }
+.midi-button.is-connected .midi-button-dot { background: var(--lime); box-shadow: 0 0 8px rgba(213,245,106,.7); }
+.midi-status { min-height: 0; margin: 0; padding: 0 25px; color: #a7a9b4; font-family: "Noto Sans JP", sans-serif; font-size: 10px; }
+.midi-status:not(:empty) { padding-top: 0; padding-bottom: 12px; }
+.play-guide { padding: 42px 0 38px; }
+.guide-heading { display: flex; align-items: center; gap: 15px; }
+.guide-heading h2 { font-size: 10px; }
+.guide-steps { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 17px; border: 1px solid var(--line); }
+.guide-steps article { min-height: 91px; position: relative; padding: 17px 15px; display: flex; gap: 13px; border-right: 1px solid var(--line); }
+.guide-steps article:last-child { border-right: 0; }
+.step-number { color: var(--lime); font-size: 9px; }
+.guide-steps h3 { margin: 0; font-family: "Noto Sans JP", sans-serif; font-size: 11px; font-weight: 500; }
+.guide-steps p { margin: 7px 0 0; color: #8a8c9b; font-family: "Noto Sans JP", sans-serif; font-size: 9px; }
+.step-mark { margin-left: auto; color: #777a89; font-size: 11px; }
+.browser-note { margin: 13px 0 0; color: #767989; font-family: "Noto Sans JP", sans-serif; font-size: 9px; line-height: 1.8; }
+.footer { min-height: 57px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,.08); color: #6f7280; font-size: 8px; letter-spacing: .1em; }
+.footer-brand { font-size: 15px; }
+
+@media (min-width: 1200px) { .app-shell { width: 1020px; } }
+@media (max-width: 760px) {
+  .app-shell { width: min(100% - 36px, 600px); }
+  .topbar { height: 63px; }
+  .topbar-note { margin-left: 0; font-size: 8px; }
+  .about-link { font-size: 8px; }
+  .intro { padding: 49px 0 31px; }
+  .intro-stamp { width: 63px; height: 63px; margin-right: 4px; font-size: 7px; }
+  .stamp-star { font-size: 15px; }
+  .instrument-heading { height: 70px; padding: 0 17px; }
+  .instrument-name { gap: 10px; }
+  .instrument-name h2 { font-size: 9px; }
+  .instrument-name p { font-size: 9px; }
+  .audio-status { font-size: 7px; }
+  .studio { grid-template-columns: 1fr; }
+  .controls-panel { padding: 17px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 17px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .panel-heading { grid-column: 1/-1; padding-bottom: 13px; }
+  .slider-control { margin-top: 0; }
+  .detune-control { margin-top: 16px; }
+  .panel-bottom { grid-column: 1/-1; margin-top: 14px; }
+  .playing-panel { padding: 17px; }
+  .visualizer { height: 115px; }
+  .piano { height: 90px; }
+  .instrument-footer { padding: 11px 16px; }
+  .midi-copy div > span { max-width: 220px; line-height: 1.6; }
+  .play-guide { padding: 34px 0 29px; }
+  .guide-steps article { min-height: 105px; padding: 13px 10px; gap: 9px; }
+  .guide-steps h3 { font-size: 10px; }
+  .guide-steps p { font-size: 8px; line-height: 1.6; }
+}
+@media (max-width: 480px) {
+  .app-shell { width: calc(100% - 28px); }
+  .topbar-note { font-size: 0; gap: 0; }
+  .topbar-note .live-dot { margin-right: 0; }
+  .topbar-divider { display: none; }
+  .about-link { font-size: 7px; }
+  .intro-stamp { display: none; }
+  h1 { font-size: 39px; }
+  .intro-copy { font-size: 11px; }
+  .instrument-heading { padding: 0 12px; }
+  .instrument-name p { max-width: 165px; }
+  .audio-status { gap: 5px; font-size: 6px; letter-spacing: 0; }
+  .controls-panel { padding: 15px 12px; column-gap: 11px; }
+  .panel-heading h3 { font-size: 9px; }
+  .control-label { font-size: 8px; }
+  select { font-size: 9px; }
+  .playing-panel { padding: 14px 11px; }
+  .keyboard-title { gap: 6px; font-size: 8px; }
+  .keyboard-octave { font-size: 6px; }
+  .octave-control { gap: 5px; font-size: 7px; }
+  .octave-control button { width: 18px; height: 18px; }
+  .piano { height: 78px; }
+  .key-label { bottom: 5px; font-size: 6px; }
+  .piano-key.black .key-label { font-size: 5px; }
+  .key-hint { gap: 5px; font-size: 7px; }
+  .key-hint-right { font-size: 7px; }
+  .instrument-footer { padding: 10px 11px; gap: 8px; }
+  .midi-icon { width: 25px; height: 25px; }
+  .midi-copy { gap: 8px; }
+  .midi-copy strong { font-size: 8px; }
+  .midi-copy div > span { max-width: 175px; font-size: 8px; }
+  .midi-button { padding: 0 8px; gap: 5px; font-size: 8px; white-space: nowrap; }
+  .guide-steps article { display: block; min-height: 120px; padding: 10px 8px; }
+  .guide-steps article > div { margin-top: 9px; }
+  .step-mark { position: absolute; top: 8px; right: 8px; }
+  .guide-steps h3 { font-size: 9px; }
+  .guide-steps p { font-size: 7px; }
+  .footer { font-size: 6px; }
+}

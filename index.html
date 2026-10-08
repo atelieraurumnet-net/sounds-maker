@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#10111a" />
+    <title>OTO — ブラウザ・シンセサイザー</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="OTO ホーム">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          OTO<span class="brand-period">.</span>
+        </a>
+        <div class="topbar-note"><span class="live-dot"></span> BROWSER SYNTHESIZER <span class="topbar-divider">/</span> 01</div>
+        <a class="about-link" href="#how-to-play">HOW TO PLAY <span aria-hidden="true">↗</span></a>
+      </header>
+
+      <section class="intro" aria-labelledby="page-title">
+        <div class="eyebrow"><span>YOUR SOUND, YOUR RULES</span><span class="eyebrow-line"></span></div>
+        <div class="intro-content">
+          <div>
+            <h1 id="page-title">音をつくろう<span class="title-period">.</span></h1>
+            <p class="intro-copy">鍵盤を押せば、そこがスタジオ。<br />好きな音をつくって、自由に鳴らそう。</p>
+          </div>
+          <div class="intro-stamp" aria-hidden="true"><span>MAKE</span><span>NOISE</span><span class="stamp-star">✳</span></div>
+        </div>
+      </section>
+
+      <section class="instrument" aria-label="シンセサイザー">
+        <div class="instrument-heading">
+          <div class="instrument-name"><span class="section-index">01</span><div><h2>YOUR INSTRUMENT</h2><p>音色をえらんで、弾いてみよう。</p></div></div>
+          <div class="audio-status"><span class="audio-status-dot"></span><span id="audio-status-text">READY TO PLAY</span></div>
+        </div>
+
+        <div class="studio">
+          <aside class="controls-panel" aria-label="音色の設定">
+            <div class="panel-heading"><span class="panel-icon" aria-hidden="true">◒</span><h3>SOUND DESIGN</h3></div>
+
+            <label class="control-label" for="waveform">WAVEFORM <span>01 / 04</span></label>
+            <div class="select-wrap">
+              <select id="waveform" aria-label="波形">
+                <option value="sawtooth">SAWTOOTH <span> / BRIGHT</span></option>
+                <option value="sine">SINE / PURE</option>
+                <option value="square">SQUARE / RETRO</option>
+                <option value="triangle">TRIANGLE / SOFT</option>
+              </select>
+              <span class="select-arrow" aria-hidden="true">⌄</span>
+            </div>
+
+            <div class="slider-control">
+              <div class="slider-heading"><label class="control-label" for="volume">MASTER VOLUME</label><output id="volume-value" for="volume">45%</output></div>
+              <input id="volume" type="range" min="0" max="100" value="45" />
+              <div class="range-ends"><span>QUIET</span><span>LOUD</span></div>
+            </div>
+
+            <div class="slider-control detune-control">
+              <div class="slider-heading"><label class="control-label" for="detune">DETUNE</label><output id="detune-value" for="detune">0 ct</output></div>
+              <input id="detune" type="range" min="-50" max="50" value="0" />
+              <div class="range-ends"><span>−50</span><span>+50</span></div>
+            </div>
+
+            <div class="panel-bottom">
+              <span class="wave-display" aria-hidden="true"><svg viewBox="0 0 120 28" preserveAspectRatio="none"><path d="M0 14h8l8-10v20l8-10h8l8-10v20l8-10h8l8-10v20l8-10h8l8-10v20l8-10h8l8-10v20l8-10h8" /></svg></span>
+              <span>ANALOG FEEL <b>●</b></span>
+            </div>
+          </aside>
+
+          <div class="playing-panel">
+            <div class="playing-top">
+              <div class="playing-label"><span class="playing-dot"></span><span>NOW PLAYING</span></div>
+              <div class="note-readout" aria-live="polite"><span id="note-name">—</span><span class="note-readout-caption">NOTE</span></div>
+            </div>
+            <div class="visualizer" aria-label="音のビジュアライザー">
+              <div class="visualizer-grid"></div>
+              <div class="visualizer-label">WAVEFORM <span>LIVE</span></div>
+              <canvas id="visualizer" aria-hidden="true"></canvas>
+              <div class="visualizer-scale"><span>LOW</span><span>FREQUENCY</span><span>HIGH</span></div>
+            </div>
+            <div class="keyboard-topline">
+              <div class="keyboard-title"><span>PIANO KEYS</span><span class="keyboard-octave">2 OCTAVES</span></div>
+              <div class="octave-control" aria-label="オクターブ設定">
+                <button id="octave-down" type="button" aria-label="1オクターブ下げる">−</button>
+                <span id="octave-label">C3 — B4</span>
+                <button id="octave-up" type="button" aria-label="1オクターブ上げる">+</button>
+              </div>
+            </div>
+            <div id="piano" class="piano" aria-label="ピアノ鍵盤"></div>
+            <div class="key-hint"><span class="computer-icon" aria-hidden="true">⌨</span><span>PC KEYBOARD</span><span class="hint-separator">/</span><span>キーを押して演奏</span><span class="key-hint-right">Z – M <span>+</span> Q – U</span></div>
+          </div>
+        </div>
+
+        <div class="instrument-footer">
+          <div class="midi-copy"><span class="midi-icon" aria-hidden="true">⇄</span><div><strong>MIDI KEYBOARD</strong><span>お持ちのMIDIキーボードも接続できます</span></div></div>
+          <button id="midi-connect" class="midi-button" type="button"><span class="midi-button-dot"></span> MIDIを接続 <span aria-hidden="true">↗</span></button>
+        </div>
+        <p id="midi-status" class="midi-status" aria-live="polite"></p>
+      </section>
+
+      <section id="how-to-play" class="play-guide">
+        <div class="guide-heading"><span class="section-index">02</span><h2>HOW TO PLAY</h2></div>
+        <div class="guide-steps">
+          <article><span class="step-number">01</span><div><h3>クリックして演奏</h3><p>鍵盤をクリック、またはタッチ。</p></div><span class="step-mark">↗</span></article>
+          <article><span class="step-number">02</span><div><h3>PCキーボードで演奏</h3><p>Z〜M、Q〜Uキーで音が鳴ります。</p></div><span class="step-mark">⌘</span></article>
+          <article><span class="step-number">03</span><div><h3>MIDIをつないで演奏</h3><p>対応ブラウザでMIDI機器を接続。</p></div><span class="step-mark">⇄</span></article>
+        </div>
+        <p class="browser-note">※ 音を鳴らすには、最初に鍵盤をクリックしてください。MIDI接続にはChromeまたはEdge（HTTPSまたはlocalhost）が必要です。</p>
+      </section>
+
+      <footer class="footer"><a class="brand footer-brand" href="#">OTO<span class="brand-period">.</span></a><span>MADE FOR THE JOY OF SOUND.</span><span>2025 — PLAY LOUD.</span></footer>
+    </main>
+  </body>
+</html>
