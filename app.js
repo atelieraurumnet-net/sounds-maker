@@ -1,13 +1,14 @@
-const NOTE_NAMES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+const NOTE_NAMES = ["C", "C", "D", "D", "E", "F", "F", "G", "G", "A", "A", "B"];
 const KEY_LAYOUT = [
-  { key: "z", offset: 0 }, { key: "s", offset: 1 }, { key: "x", offset: 2 },
-  { key: "d", offset: 3 }, { key: "c", offset: 4 }, { key: "v", offset: 5 },
-  { key: "g", offset: 6 }, { key: "b", offset: 7 }, { key: "h", offset: 8 },
-  { key: "n", offset: 9 }, { key: "j", offset: 10 }, { key: "m", offset: 11 },
-  { key: "q", offset: 12 }, { key: "2", offset: 13 }, { key: "w", offset: 14 },
-  { key: "3", offset: 15 }, { key: "e", offset: 16 }, { key: "r", offset: 17 },
-  { key: "5", offset: 18 }, { key: "t", offset: 19 }, { key: "6", offset: 20 },
-  { key: "y", offset: 21 }, { key: "7", offset: 22 }, { key: "u", offset: 23 },
+  { key: "a", offset: 0 }, { key: "w", offset: 1 }, { key: "s", offset: 2 },
+  { key: "e", offset: 3 }, { key: "d", offset: 4 }, { key: "f", offset: 5 },
+  { key: "t", offset: 6 }, { key: "g", offset: 7 }, { key: "y", offset: 8 },
+  { key: "h", offset: 9 }, { key: "u", offset: 10 }, { key: "j", offset: 11 },
+  { key: "k", offset: 12 }, { key: "o", offset: 13 }, { key: "l", offset: 14 },
+  { key: "p", offset: 15 }, { key: ";", offset: 16 },
+  { key: "[", offset: 17 }, { key: "'", offset: 18 }, { key: "z", offset: 19 },
+  { key: "x", offset: 20 }, { key: "c", offset: 21 }, { key: "v", offset: 22 },
+  { key: "b", offset: 23 },
 ];
 const BLACK_NOTES = new Set([1, 3, 6, 8, 10]);
 const WHITE_NOTE_COUNT = 14;
@@ -20,17 +21,31 @@ const audioStatus = document.querySelector(".audio-status");
 const audioStatusText = document.querySelector("#audio-status-text");
 const midiButton = document.querySelector("#midi-connect");
 const midiStatus = document.querySelector("#midi-status");
-const waveformControl = document.querySelector("#waveform");
 const volumeControl = document.querySelector("#volume");
 const detuneControl = document.querySelector("#detune");
 const canvas = document.querySelector("#visualizer");
 const canvasContext = canvas.getContext("2d");
+const waveformMixInputs = Object.fromEntries([
+  "sine",
+  "triangle",
+  "square",
+  "sawtooth",
+  "noise",
+].map((wave) => [wave, document.querySelector(`#waveform-${wave}`)]));
+const waveformMixDefaults = {
+  sine: 0,
+  triangle: 0,
+  square: 0,
+  sawtooth: 100,
+  noise: 0,
+};
 
 let baseMidiNote = 48;
 let audioContext;
 let masterGain;
 let analyser;
 let midiAccess;
+let midiPermissionGranted = false;
 let activeMidiInputs = new Set();
 const voices = new Map();
 const heldKeys = new Set();
@@ -116,21 +131,79 @@ function ensureAudio() {
   if (audioContext.state === "suspended") void audioContext.resume();
 }
 
+function readWaveformMix() {
+  return Object.fromEntries(Object.entries(waveformMixInputs).map(([wave, input]) => [
+    wave,
+    Number(input ? input.value : waveformMixDefaults[wave]),
+  ]));
+}
+
+function refreshWaveformMixDisplay() {
+  const mix = readWaveformMix();
+  for (const [wave, input] of Object.entries(waveformMixInputs)) {
+    const value = Number(input.value);
+    const output = document.querySelector(`#waveform-${wave}-value`);
+    if (output) output.textContent = `${value}%`;
+    mix[wave] = value;
+  }
+  return mix;
+}
+
+function createVoiceNode(midiNote, velocity = 0.8) {
+  const now = audioContext.currentTime;
+  const mix = readWaveformMix();
+  const totalMix = Object.values(mix).reduce((sum, value) => sum + value, 0) || 1;
+  const gain = audioContext.createGain();
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.connect(masterGain);
+
+  const partials = [];
+  for (const [wave, weight] of Object.entries(mix)) {
+    if (weight <= 0) continue;
+    const partialGain = audioContext.createGain();
+    const normalized = (weight / totalMix) * 0.9 * velocity;
+    partialGain.gain.setValueAtTime(0.0001, now);
+    partialGain.gain.exponentialRampToValueAtTime(Math.max(0.0002, normalized), now + 0.018);
+    partialGain.connect(gain);
+
+    let node;
+    if (wave === "noise") {
+      const bufferSize = audioContext.sampleRate * 2;
+      const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+      const channelData = buffer.getChannelData(0);
+      for (let index = 0; index < bufferSize; index += 1) {
+        channelData[index] = Math.random() * 2 - 1;
+      }
+
+      const noiseSource = audioContext.createBufferSource();
+      noiseSource.buffer = buffer;
+      noiseSource.loop = true;
+      noiseSource.connect(partialGain);
+      noiseSource.start(now);
+      node = noiseSource;
+    } else {
+      const oscillator = audioContext.createOscillator();
+      oscillator.type = wave;
+      oscillator.frequency.value = 440 * 2 ** ((midiNote - 69) / 12);
+      oscillator.detune.value = Number(detuneControl.value);
+      oscillator.connect(partialGain);
+      oscillator.start(now);
+      node = oscillator;
+    }
+
+    partials.push({ wave, node, gain: partialGain });
+  }
+
+  gain.gain.exponentialRampToValueAtTime(1, now + 0.02);
+  const primaryOscillator = partials.find((partial) => partial.wave !== "noise")?.node ?? partials[0]?.node;
+  return { oscillator: primaryOscillator, gain, partials, midiNote, velocity, waveform: "mixed" };
+}
+
 function startVoice(source, midiNote, velocity = 0.8) {
   if (voices.has(source)) return;
   ensureAudio();
-  const oscillator = audioContext.createOscillator();
-  const gain = audioContext.createGain();
-  oscillator.type = waveformControl.value;
-  oscillator.frequency.value = 440 * 2 ** ((midiNote - 69) / 12);
-  oscillator.detune.value = Number(detuneControl.value);
-  const now = audioContext.currentTime;
-  gain.gain.setValueAtTime(0.0001, now);
-  gain.gain.exponentialRampToValueAtTime(Math.max(0.0002, velocity), now + 0.018);
-  oscillator.connect(gain);
-  gain.connect(masterGain);
-  oscillator.start(now);
-  voices.set(source, { oscillator, gain, midiNote });
+  const voice = createVoiceNode(midiNote, velocity);
+  voices.set(source, voice);
   refreshActiveKeys();
 }
 
@@ -141,11 +214,17 @@ function stopVoice(source) {
   const now = audioContext.currentTime;
   voice.gain.gain.cancelScheduledValues(now);
   voice.gain.gain.setTargetAtTime(0.0001, now, 0.045);
-  voice.oscillator.stop(now + 0.25);
-  voice.oscillator.addEventListener("ended", () => {
-    voice.oscillator.disconnect();
-    voice.gain.disconnect();
-  }, { once: true });
+
+  const stopNodes = (voice.partials ?? [{ node: voice.oscillator }]).filter((partial) => partial && partial.node && typeof partial.node.stop === "function");
+  for (const partial of stopNodes) {
+    partial.node.stop(now + 0.25);
+    partial.node.addEventListener("ended", () => {
+      partial.node.disconnect();
+      if (partial.gain) partial.gain.disconnect();
+    }, { once: true });
+  }
+
+  voice.gain.disconnect();
   refreshActiveKeys();
 }
 
@@ -220,9 +299,32 @@ document.querySelector("#octave-up").addEventListener("click", () => {
   }
 });
 
-waveformControl.addEventListener("change", () => {
-  for (const voice of voices.values()) voice.oscillator.type = waveformControl.value;
-});
+for (const input of Object.values(waveformMixInputs)) {
+  input.addEventListener("input", () => {
+    refreshWaveformMixDisplay();
+    if (!audioContext || !masterGain) return;
+    for (const [source, voice] of [...voices.entries()]) {
+      const now = audioContext.currentTime;
+      if (voice.gain) {
+        voice.gain.gain.cancelScheduledValues(now);
+        voice.gain.gain.setTargetAtTime(0.0001, now, 0.025);
+      }
+      for (const partial of voice.partials ?? []) {
+        if (partial.node && typeof partial.node.stop === "function") {
+          partial.node.stop(now + 0.05);
+          partial.node.addEventListener("ended", () => {
+            partial.node.disconnect();
+            if (partial.gain) partial.gain.disconnect();
+          }, { once: true });
+        }
+      }
+      const nextVoice = createVoiceNode(voice.midiNote, voice.velocity ?? 0.8);
+      if (voice.gain) voice.gain.disconnect();
+      voices.set(source, nextVoice);
+    }
+    refreshActiveKeys();
+  });
+}
 
 volumeControl.addEventListener("input", () => {
   const value = Number(volumeControl.value);
@@ -239,7 +341,12 @@ detuneControl.addEventListener("input", () => {
   detuneControl.style.setProperty("--range-progress", `${((value + 50) / 100) * 100}%`);
   if (audioContext) {
     for (const voice of voices.values()) {
-      voice.oscillator.detune.setTargetAtTime(value, audioContext.currentTime, 0.015);
+      if (!voice.partials) continue;
+      for (const partial of voice.partials) {
+        if (partial.node && typeof partial.node.detune !== "undefined") {
+          partial.node.detune.setTargetAtTime(value, audioContext.currentTime, 0.015);
+        }
+      }
     }
   }
 });
@@ -249,10 +356,16 @@ async function connectMidi() {
     midiStatus.textContent = "このブラウザはWeb MIDIに対応していません。ChromeまたはEdgeをご利用ください。";
     return;
   }
+  if (midiAccess) {
+    midiStatus.textContent = "MIDIアクセスは許可されています。接続された機器があれば自動で認識します。";
+    updateMidiInputs();
+    return;
+  }
   midiButton.disabled = true;
   midiStatus.textContent = "MIDI機器を確認しています…";
   try {
     midiAccess = await navigator.requestMIDIAccess({ sysex: false });
+    midiPermissionGranted = true;
     midiAccess.onstatechange = updateMidiInputs;
     updateMidiInputs();
   } catch (error) {
@@ -266,11 +379,14 @@ async function connectMidi() {
 
 function updateMidiInputs() {
   if (!midiAccess) return;
-  const connectedInputs = new Set([...midiAccess.inputs.values()].filter((input) => input.state === "connected"));
+  const connectedInputs = new Set([...midiAccess.inputs.values()].filter((input) => {
+    const hasName = typeof input.name === "string" && input.name.trim().length > 0;
+    return input.state === "connected" && hasName;
+  }));
   for (const input of activeMidiInputs) {
     if (connectedInputs.has(input)) continue;
     input.onmidimessage = null;
-    for (const [source, midiNote] of midiSources) {
+    for (const [source] of midiSources) {
       if (!source.startsWith(`${input.id}:`)) continue;
       stopVoice(source);
       midiSources.delete(source);
@@ -282,13 +398,20 @@ function updateMidiInputs() {
   }
   activeMidiInputs = connectedInputs;
   const count = connectedInputs.size;
-  midiButton.classList.toggle("is-connected", count > 0);
-  midiButton.innerHTML = count
+  const isConnected = count > 0;
+  midiButton.classList.toggle("is-connected", isConnected);
+  midiButton.innerHTML = isConnected
     ? `<span class="midi-button-dot"></span> MIDI接続中 (${count}) <span aria-hidden="true">↗</span>`
     : `<span class="midi-button-dot"></span> MIDIを接続 <span aria-hidden="true">↗</span>`;
-  midiStatus.textContent = count
+
+  if (!midiPermissionGranted) {
+    midiStatus.textContent = "MIDIアクセスを許可してください。";
+    return;
+  }
+
+  midiStatus.textContent = isConnected
     ? `${count}台のMIDI機器が接続されています。キーボードを弾いてください。`
-    : "MIDIアクセスを許可しました。機器を接続すると自動で認識します。";
+    : "MIDIアクセスは許可されています。接続された機器があれば自動で認識します。";
 }
 
 function handleMidiMessage(input, event) {
@@ -307,6 +430,7 @@ function handleMidiMessage(input, event) {
 }
 
 midiButton.addEventListener("click", connectMidi);
+refreshWaveformMixDisplay();
 volumeControl.dispatchEvent(new Event("input"));
 detuneControl.dispatchEvent(new Event("input"));
 renderKeyboard();
